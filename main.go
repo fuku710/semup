@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"sort"
 
 	"github.com/Masterminds/semver/v3"
@@ -34,6 +35,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if semver.Collection(vs).Len() == 0 {
+		fmt.Println("No versions")
+		os.Exit(0)
+	}
 	sort.Sort(sort.Reverse(semver.Collection(vs)))
 	fmt.Println("Latest version:", vs[0])
 	prompt := promptui.Select{
@@ -58,6 +63,7 @@ func main() {
 		fmt.Println(v)
 		createTag(*r, v.String())
 	}
+	os.Exit(0)
 }
 
 func createTag(r git.Repository, tag string) {
