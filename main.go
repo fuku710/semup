@@ -51,11 +51,11 @@ func main() {
 		createTag(*r, v.String())
 	case "Minor":
 		v := vs[0].IncMinor()
-		fmt.Println(vs[0].IncMinor())
+		fmt.Println(v)
 		createTag(*r, v.String())
 	case "Major":
 		v := vs[0].IncMajor()
-		fmt.Println(vs[0].IncMajor())
+		fmt.Println(v)
 		createTag(*r, v.String())
 	}
 }
