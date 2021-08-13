@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/fuku710/semup"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -16,31 +15,24 @@ import (
 func main() {
 	kingpin.Version("0.0.1")
 	kingpin.Parse()
+
 	var r, err = git.PlainOpen("./")
 	if err != nil {
 		log.Fatal(err)
 	}
-	tIter, err := r.Tags()
+
+	vs, err := semup.ListVersions(r)
 	if err != nil {
 		log.Fatal(err)
 	}
-	vs := []*semver.Version{}
-	err = tIter.ForEach(func(t *plumbing.Reference) error {
-		v, err := semver.NewVersion(t.Name().Short())
-		if err == nil {
-			vs = append(vs, v)
-		}
-		return nil
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	if semver.Collection(vs).Len() == 0 {
 		fmt.Println("No versions")
 		os.Exit(0)
 	}
-	sort.Sort(sort.Reverse(semver.Collection(vs)))
+
 	fmt.Println("Latest version:", vs[0])
+
 	prompt := promptui.Select{
 		Label: "Select next version",
 		Items: []string{"Patch", "Minor", "Major"},
@@ -49,6 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	switch result {
 	case "Patch":
 		v := vs[0].IncPatch()
